@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 16px Arial;
+    }
+
+    .autocomplete {
+      position: relative;
+      display: inline-block;
+      border: black 1px solid;
+    }
+
+    #cross {
+
+      position: absolute;
+      top: 3px;
+      right: 3px;
+    }
+
+    #search {
+      position: absolute;
+      top: 3px;
+
+    }
+
+    #wordIp {
+      padding-left: 40px;
+    }
+
+    input {
+      border: 1px solid transparent;
+      background-color: white;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    input[type=text] {
+      background-color: white;
+      width: 100%;
+    }
+
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: white;
+      border-bottom: 1px solid #d4d4d4;
+    }
+
+    .autocomplete-items div:hover {
+      background-color: grey;
+    }
+
+    .autocomplete-active {
+      background-color: #d4d4d4 !important;
+      color: black;
+    }
+
+    .clear :hover {
+      cursor: pointer;
+    }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+
+  <form>
+    <div class="autocomplete" style="width:300px;">
+
+      <input tabindex="1" id="wordIp" value="" type="text" placeholder="search">
+      <span class="clear"> <img id="cross" tabindex="2" src="clear.png" width=40/></span>
+      <img id="search" src="search.png" width=40>
+    </div>
+  </form>
+
+  <script>
+    document.querySelector('.clear').addEventListener("click", function() {
+      console.log("IT WORKS");
+      document.getElementById("wordIp").value = "";
+    }, false);
+    document.onkeydown = function(evt) {
+      evt = evt || window.event;
+      if (evt.keyCode == 27) {
+        document.getElementById("wordIp").value = "";
+      }
+    };
+
+    function autocomplete(inp, arr) {
+      var currentFocus;
+      if (inp) {
+        inp.addEventListener("input", function(e) {
+          var a, b, i, val = this.value;
+          closeAllLists();
+          if (!val) {
+            return false;
+          }
+          currentFocus = -1;
+          a = document.createElement("DIV");
+          a.setAttribute("id", this.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          this.parentNode.appendChild(a);
+          for (i = 0; i < arr.length; i++) {
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+              b = document.createElement("DIV");
+              b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+              b.innerHTML += arr[i].substr(val.length);
+              b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+              b.addEventListener("click", function(e) {
+                inp.value = this.getElementsByTagName("input")[0].value;
+                closeAllLists();
+              });
+              a.appendChild(b);
+            }
+          }
+        });
+        inp.addEventListener("keydown", function(e) {
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            currentFocus++;
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            currentFocus--;
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            e.preventDefault();
+            if (currentFocus > -1) {
+              if (x) x[currentFocus].click();
+            }
+          }
+        })
+      };
+
+      function addActive(x) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+
+      function removeActive(x) {
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+
+      function closeAllLists(elmnt) {
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt != x[i] && elmnt != inp) {
+            x[i].parentNode.removeChild(x[i]);
+          }
+        }
+      }
+      document.addEventListener("click", function(e) {
+        closeAllLists(e.target);
+      });
+    }
+    var words = ["asdf", "asd", "Enwist", "Oille", "pComet", "iAinf", "euBicr", "onKic", "atiPti", "oloVe", "ntio", "bro", "code", "decides", "endings", "for", "gentlemen",
+      "hindering", "impassive", "judgements",
+      "killing", "lofty", "mirages",
+      "navigating", "our", "perplexing", "qualms",
+      "reasoning", "silently", "through", "unending", "vexes",
+      "while", "xeroflulogitis", "yields", "zenith"
+    ];
+    autocomplete(document.getElementById("wordIp"), words);
+  </script>
+
+</body>
+
+</html>
